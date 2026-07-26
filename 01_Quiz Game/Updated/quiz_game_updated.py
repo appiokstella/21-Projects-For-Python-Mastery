@@ -1,80 +1,51 @@
-"""
-Quiz School
-Main Program - Part 1
-"""
-
+import os
+import sys
 import random
 from datetime import datetime
-
 from questions import QUESTIONS
-
-# ----------------------------------------
-# Files
-# ----------------------------------------
 
 PERSONAL_BEST_FILE = "personal_best.txt"
 HISTORY_FILE = "quiz_history.txt"
+MAX_LIVES = 3
 
 
-# ----------------------------------------
-# Create files if they don't exist
-# ----------------------------------------
-
-try:
-    with open(PERSONAL_BEST_FILE, "x") as file:
+if not os.path.exists(PERSONAL_BEST_FILE):
+    with open(PERSONAL_BEST_FILE, "w") as file:
         file.write("0")
-except FileExistsError:
-    pass
 
-try:
-    with open(HISTORY_FILE, "x") as file:
-        pass
-except FileExistsError:
-    pass
+if not os.path.exists(HISTORY_FILE):
+    open(HISTORY_FILE, "w").close()
 
-
-# ----------------------------------------
-# Personal Best Functions
-# ----------------------------------------
 
 def get_personal_best():
-    """
-    Returns the saved personal best score.
-    """
+    """Return the saved personal best score."""
 
     try:
         with open(PERSONAL_BEST_FILE, "r") as file:
             return int(file.read())
 
-    except:
+    except (FileNotFoundError, ValueError):
         return 0
 
 
 def save_personal_best(score):
-    """
-    Saves a new personal best.
-    """
+    """Save a new personal best score."""
 
     with open(PERSONAL_BEST_FILE, "w") as file:
         file.write(str(score))
 
 
-# ----------------------------------------
-# Quiz History
-# ----------------------------------------
-
-def save_history(category, difficulty, score, total):
-    """
-    Saves quiz attempt to history.
-    """
+def save_history(player, category, difficulty, score, total):
+    """Save each quiz attempt."""
 
     now = datetime.now()
 
-    percentage = (score / total) * 100
+    percentage = (score / total * 100) if total else 0
 
     with open(HISTORY_FILE, "a") as file:
 
         file.write(
+            f"{player} | "
             f"{now.strftime('%d/%m/%Y')} | "
             f"{now.strftime('%H:%M:%S')} | "
             f"{category} | "
@@ -84,24 +55,18 @@ def save_history(category, difficulty, score, total):
         )
 
 
-# ----------------------------------------
-# Welcome Screen
-# ----------------------------------------
+print("=" * 60)
+print("Welcome to Quiz Game!")
+print("=" * 60)
 
-print("=" * 55)
-print("🧠 Welcome to Quiz School!")
-print("=" * 55)
+player_name = input("\nEnter your name: ").strip().title()
 
-play = input("Do you want to play? (Yes/No): ").strip().lower()
+play = input("\nDo you want to play? (Yes/No): ").strip().lower()
 
 if play != "yes":
-    print("\nThanks for visiting Quiz School!")
+    print("\n Thanks for visiting Quiz Game!")
     quit()
 
-
-# ----------------------------------------
-# Category Selection
-# ----------------------------------------
 
 categories = list(QUESTIONS.keys())
 
@@ -121,14 +86,10 @@ while True:
         if 1 <= choice <= len(categories):
             break
 
-    print("❌ Invalid choice. Try again.")
+    print(" Invalid choice. Please try again.")
 
 selected_category = categories[choice - 1]
 
-
-# ----------------------------------------
-# Difficulty Selection
-# ----------------------------------------
 
 print("\nChoose Difficulty\n")
 
@@ -138,63 +99,61 @@ print("3. Hard")
 
 while True:
 
-    difficulty_choice = input("\nEnter your choice: ")
+    difficulty = input("\nEnter your choice: ")
 
-    if difficulty_choice == "1":
+    if difficulty == "1":
         selected_difficulty = "Easy"
         break
 
-    elif difficulty_choice == "2":
+    elif difficulty == "2":
         selected_difficulty = "Medium"
         break
 
-    elif difficulty_choice == "3":
+    elif difficulty == "3":
         selected_difficulty = "Hard"
         break
 
-    print("❌ Invalid choice.")
+    print("Invalid choice.")
 
-
-# ----------------------------------------
-# Load Questions
-# ----------------------------------------
 
 questions = QUESTIONS[selected_category][selected_difficulty]
 
-# Shuffle questions every game
 random.shuffle(questions)
 
 score = 0
-lives = 3
+lives = MAX_LIVES
 total_questions = len(questions)
 
-print("\n" + "=" * 55)
-print(f"Category   : {selected_category}")
-print(f"Difficulty : {selected_difficulty}")
-print(f"Lives      : ❤️❤️❤️")
-print("=" * 55)
-print("\nThe quiz is starting...\n")
+print("\n" + "=" * 60)
+print(" Game Settings")
+print("=" * 60)
 
-# ----------------------------------------
-# Quiz Loop
-# ----------------------------------------
+print(f"Player      : {player_name}")
+print(f"Category    : {selected_category}")
+print(f"Difficulty  : {selected_difficulty}")
+print(f"Lives       : {'❤️' * lives}")
+print(f"Questions   : {total_questions}")
+
+print("=" * 60)
+
+input("\nPress Enter to begin the quiz...")
+print()
 
 for question_number, question in enumerate(questions, start=1):
 
-    print("=" * 55)
+    print("=" * 60)
     print(f"Question {question_number} of {total_questions}")
     print(f"Score : {score}")
     print(f"Lives : {'❤️' * lives}")
-    print("=" * 55)
+    print("=" * 60)
 
     print("\n" + question["question"])
 
-    answer = input("Your Answer: ").strip().lower()
+    answer = input("\nYour Answer: ").strip().lower()
 
     if answer == question["answer"]:
 
         score += 1
-
         print("\n✅ Correct!")
 
     else:
@@ -209,152 +168,94 @@ for question_number, question in enumerate(questions, start=1):
 
     print(f"\nCurrent Score: {score}/{question_number}")
 
-    input("\nPress Enter to continue...")
-
-    print("\n" * 2)
-
-    # ----------------------------
-    # Game Over
-    # ----------------------------
-
     if lives == 0:
 
-        print("=" * 55)
-        print("💀 GAME OVER!")
-        print("=" * 55)
-
-        print(f"\nYou finished with a score of {score}/{total_questions}")
-
-        percentage = (score / total_questions) * 100
-
-        print(f"Percentage: {percentage:.1f}%")
-
-        save_history(
-            selected_category,
-            selected_difficulty,
-            score,
-            total_questions
-        )
-
-        best = get_personal_best()
-
-        if score > best:
-
-            print("\n🏆 Congratulations!")
-            print("You achieved a NEW Personal Best!")
-
-            save_personal_best(score)
-
-        else:
-
-            print(f"\n🏆 Personal Best: {best}")
+        print("\n" + "=" * 60)
+        print("GAME OVER!")
+        print("=" * 60)
 
         break
+
+    input("\nPress Enter for the next question...")
+    print("\n")
+
+
+percentage = (score / total_questions * 100) if total_questions else 0
+
+print("\n" + "=" * 60)
+print("QUIZ RESULTS")
+print("=" * 60)
+
+print(f"Player      : {player_name}")
+print(f"Category    : {selected_category}")
+print(f"Difficulty  : {selected_difficulty}")
+print(f"Score       : {score}/{total_questions}")
+print(f"Percentage  : {percentage:.1f}%")
+
+
+if percentage == 100:
+    grade = "🏆 A+"
+    message = "Outstanding! Perfect Score!"
+
+elif percentage >= 80:
+    grade = "🥇 A"
+    message = "Excellent Work!"
+
+elif percentage >= 70:
+    grade = "🥈 B"
+    message = "Very Good!"
+
+elif percentage >= 60:
+    grade = "🥉 C"
+    message = "Good Job!"
+
+elif percentage >= 50:
+    grade = "D"
+    message = "You Passed!"
+
+else:
+    grade = "F"
+    message = "Keep Practicing!"
+
+print(f"Grade       : {grade}")
+print(message)
+
+save_history(
+    player_name,
+    selected_category,
+    selected_difficulty,
+    score,
+    total_questions
+)
+
+best = get_personal_best()
+
+if score > best:
+
+    save_personal_best(score)
+
+    print("\n NEW PERSONAL BEST!")
+    print(f"Previous Best : {best}")
+    print(f"New Best      : {score}")
 
 else:
 
-    # ----------------------------
-    # Player finished every question
-    # ----------------------------
+    print(f"\n Personal Best : {best}")
 
-    print("=" * 55)
-    print("🎉 QUIZ COMPLETE!")
-    print("=" * 55)
 
-    percentage = (score / total_questions) * 100
+print("\n" + "=" * 60)
+print(" Your quiz attempt has been saved.")
+print(" Thanks for playing Quiz School!")
 
-    print(f"\nFinal Score : {score}/{total_questions}")
-    print(f"Percentage  : {percentage:.1f}%")
+again = input("\nWould you like to play again? (Yes/No): ").strip().lower()
 
-    # ----------------------------
-    # Grade
-    # ----------------------------
+if again == "yes":
 
-    if percentage == 100:
-        grade = "A+"
-        message = "Outstanding!"
+    print("\nRestarting Quiz School...\n")
 
-    elif percentage >= 80:
-        grade = "A"
-        message = "Excellent!"
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
-    elif percentage >= 70:
-        grade = "B"
-        message = "Very Good!"
+else:
 
-    elif percentage >= 60:
-        grade = "C"
-        message = "Good!"
-
-    elif percentage >= 50:
-        grade = "D"
-        message = "Pass"
-
-    else:
-        grade = "F"
-        message = "Keep Practicing!"
-
-    print(f"Grade       : {grade}")
-    print(message)
-
-    # ----------------------------
-    # Save Quiz History
-    # ----------------------------
-
-    save_history(
-        selected_category,
-        selected_difficulty,
-        score,
-        total_questions
-    )
-
-    # ----------------------------
-    # Personal Best
-    # ----------------------------
-
-    best = get_personal_best()
-
-    if score > best:
-
-        save_personal_best(score)
-
-        print("\n🏆 NEW PERSONAL BEST!")
-
-        print(f"Old Best : {best}")
-        print(f"New Best : {score}")
-
-    else:
-
-        print(f"\n🏆 Personal Best: {best}")
-
-# ----------------------------------------
-# Main Menu
-# ----------------------------------------
-
-# ----------------------------------------
-# Play Again
-# ----------------------------------------
-
-while True:
-
-    again = input("\nWould you like to play again? (Yes/No): ").strip().lower()
-
-    if again == "yes":
-
-        print("\nRestarting the quiz...\n")
-
-        # Restart the program
-        import os
-        import sys
-
-        os.execv(sys.executable, ["python"] + sys.argv)
-
-    elif again == "no":
-
-        print("\n🏆 Personal Best:", get_personal_best())
-        print("👋 Thanks for playing Quiz School!")
-        break
-
-    else:
-
-        print("❌ Please enter Yes or No.")
+    print("\n Goodbye, see you next time!")
+    print("=" * 60)
