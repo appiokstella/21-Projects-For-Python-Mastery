@@ -1,4 +1,4 @@
-A guide to using this repo as a learning resource — whether you're following along project-by-project or forking it to run your own version of the challenge.
+A guide to using this repo as a learning resource, whether you're following along project-by-project or forking it to run your own version of the challenge.
 
 ## Who this is for
 
@@ -54,7 +54,3 @@ If you'd like to suggest an additional project, a fix to an existing one, or an 
 1. Open an issue describing the change first for anything beyond a small fix.
 2. Keep the same folder pattern: `NN_Project Name/` containing the code and a `README.md` with the four standard sections (what it does, what I learned, what was hard, what's next).
 3. Reference the concepts table above so new projects slot into the existing difficulty progression rather than duplicating an earlier skill.
-
-## License
-
-This repo is released under the [MIT License](LICENSE) — use, fork, and adapt any of it freely for your own learning.
