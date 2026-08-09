@@ -113,13 +113,11 @@ Every project folder has its own `README.md` with:
 | Day 20 | 11/07/26 | Advanced Python Scripting  |
 | Day 21 | 10/07/26 | Shortest Path Finder       |
 
-_Updated daily as each project is completed._
-
 ---
 
 ## 🛠 Tools and Setup
 
-- **Language:** Python 3.12
+- **Language:** Python 3.12 or newer
 - **Editor:** VS Code
 - **Version Control:** Git + GitHub
 
@@ -129,6 +127,3 @@ _Updated daily as each project is completed._
 
 If this repo inspires you to start your own Python journey , give it a star.
 
----
-
-_"The best time to start was yesterday. The second best time is now."_
